@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+/* fallback */
+@font-face {
+  font-family: 'PressStart2P';
+  font-style: normal;
+  font-weight: 400;
+  src: url(http://localhost:5000/fonts/PressStart2P.ttf) format('woff2');
+}
+
+
+
+* {
+  font-family: "IBM Plex Sans", "Roboto", "Verdana", "Geneva", "Tahoma",
+    "sans-serif";
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
