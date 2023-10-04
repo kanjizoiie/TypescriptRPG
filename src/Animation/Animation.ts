@@ -1,25 +1,38 @@
 import { Ticker } from "pixi.js";
 
 export class Animation {
-  currentTime: number = 0;
-  animationFunction: () => void;
+  private currentTime: number = 1;
+  private duration: number = 32;
+  private ticker: Ticker;
 
-  setup(animationFunction: () => void) {
-    this.animationFunction = animationFunction;
-    Ticker.shared.add(this.handleTick);
+  constructor() {
+    this.ticker = new Ticker();
+    this.ticker.add((delta) => { this.update(delta) });
+  }
+
+  start() {
+    this.ticker.start();
+  }
+
+  stop() {
+    this.ticker.stop();
   }
 
   reset() {
-    this.currentTime = 0;
+    this.stop();
+    this.currentTime = 1;
+    this.start();
   }
 
-  private handleTick(deltaTime: number) {
+  private update(deltaTime: number) {
     this.currentTime += deltaTime;
-    if (this.animationFunction) this.animationFunction();
+    if (this.currentTime >= this.duration) {
+      this.currentTime = this.duration;
+      this.stop();
+    }
   }
 
-
-  tween(current_time: number, start_value: number, change: number, duration: number) {
-    return (change * (current_time / duration)) + start_value;
+  tween(startValue: number, endValue: number) {
+    return (endValue * (this.currentTime / this.duration)) + startValue;
   }
 }

@@ -1,36 +1,42 @@
-import { isTSMethodSignature, tSMethodSignature } from '@babel/types';
-import * as PIXI from 'pixi.js';
-import { Ticker, Container, Graphics, ITextStyle, Text, TextStyle, UPDATE_PRIORITY, DisplayObject } from 'pixi.js';
+import { Ticker, Container, Graphics, ITextStyle, Text, TextStyle, UPDATE_PRIORITY, Sprite } from 'pixi.js';
 
-
-const data: Array<MenuItem> = [
-  { text: "Option 1", onSelected: () => { console.log("SELECTED OPTION 1"); } },
-  { text: "Option 2 with submenu" },
-]
 
 interface MenuItem {
   text?: string;
-  onSelected?: () => void;
+  sub?: Array<MenuItem>;
 }
 
-export class Menu {
+interface MenuData {
+  row: Container,
+  text: Text,
+  selector: Graphics | Text | Sprite
+}
+
+export class Menu extends Container {
+
   private menuModel: Array<MenuItem>;
-  private dataModel: Array<{ row: Container, text: Text, selector: Graphics }>;
+  private menuModelHistory: Array<Array<MenuItem>> = [];
+  private dataModel: Array<MenuData>;
 
   private selected: number = 0;
-  private container: PIXI.Container;
+  private disabled: boolean = false;
 
-  textStyle: TextStyle | Partial<ITextStyle>;
 
-  constructor(menuItems: Array<MenuItem>, textStyle?: PIXI.TextStyle) {
-    this.container = new PIXI.Container();
-    this.textStyle = textStyle;
-    this.menuModel = menuItems;
+
+  constructor(
+    menuModel: Array<MenuItem>,
+  ) {
+    super();
+
+    /**
+     * Set members.
+     */
+    this.menuModel = menuModel;
 
     /**
      * Create base menu!
      */
-    this.createMenu();
+    this.setMenuModel(menuModel)
 
 
     /**
@@ -41,9 +47,15 @@ export class Menu {
     }, null, UPDATE_PRIORITY.NORMAL)
   }
 
-  setPosition(x: number, y: number) {
-    this.container.x = x;
-    this.container.y = y;
+  setDisabled(disable: boolean) {
+    this.disabled = disable;
+    this.createMenu();
+  }
+
+  setMenuModel(menuModel: Array<MenuItem>) {
+    this.selected = 0;
+    this.menuModel = menuModel;
+    this.createMenu();
   }
 
   setSelected(selected: number) {
@@ -57,29 +69,70 @@ export class Menu {
   }
 
   select() {
-    if (this.menuModel[this.selected].onSelected) this.menuModel[this.selected].onSelected();
+    const selected = this.menuModel[this.selected];
+    if (selected.sub) {
+      /**
+       * Push current menu model to stack.
+       */
+      this.menuModelHistory.push(this.menuModel);
+      /**
+       * Set submenu as current menu model.
+       */
+      this.setMenuModel(selected.sub);
+    } else {
+    }
+  }
+
+  back() {
+    this.setMenuModel(this.menuModelHistory.pop());
   }
 
   private generateGraphics() {
-    return this.container.addChild(
-      new Graphics()
-    );
+    return new Graphics()
   }
 
+  private getTextStyle() {
+    if (this.disabled) {
+      return new TextStyle({
+        fontFamily: 'PressStart2P',
+        fontSize: 12,
+        fill: '#a5a5a5',
+        wordWrap: true,
+        wordWrapWidth: 600,
+      });
+    } else {
+      return new TextStyle({
+        fontFamily: 'PressStart2P',
+        fontSize: 12,
+        fill: '#FFFFFF',
+        wordWrap: true,
+        wordWrapWidth: 600,
+      });
+    }
+  }
+  
   private generateText() {
-    return new Text("PLACEHOLDER!", this.textStyle);
+    return new Text("PLACEHOLDER!", this.getTextStyle());
   }
 
   private generateRow() {
-    return this.container.addChild(new Container());
+    return new Container();
   }
 
   /**
    * Creates the displayobjects.
    */
   private createMenu() {
+    this.removeChildren();
+    /**
+     * For each item, create model datapoint.
+     */
     this.dataModel = this.menuModel.map(({ text }, index) => {
-      const row = this.generateRow();
+      /**
+       * Generate and add container as row
+       */
+      const row = this.addChild(this.generateRow());
+
       return {
         row: row,
         selector: row.addChild(this.generateGraphics()),
@@ -94,7 +147,7 @@ export class Menu {
    */
   private composeRow() {
     this.dataModel.forEach(({ selector, text, row }, index) => {
-      row.transform.position.set(0, index * 24);
+      row.transform.position.set(0, (index * text.height));
       text.position.x = 24;
     })
   }
@@ -103,18 +156,19 @@ export class Menu {
    * Updates the displayobjects with new data
    */
   private update() {
-    this.dataModel.map(({ selector, text }, index) => {
-      if (text.text != this.menuModel[index].text) {
-        text.text = this.menuModel[index].text;
-      }
-      selector
-        .clear()
-        .beginFill(this.selected == index ? 0x00FF00 : 0xFF0000)
-        .drawCircle(0, 24 / 2, 4)
-    });
-  }
+    this.dataModel.map(({ row, selector, text }, index) => {
+      if (row) {
+        if (text.text != this.menuModel[index].text) {
+          text.text = this.menuModel[index].text;
+        }
 
-  draw(container: Container) {
-    container.addChild(this.container);
+        if (selector instanceof Graphics) {
+          selector
+            .clear()
+            .beginFill(this.selected == index ? 0x00FF00 : 0xFF0000)
+            .drawCircle(0, (text.height / 2), 3)
+        }
+      }
+    });
   }
 }

@@ -1,13 +1,13 @@
-import { Application, UPDATE_PRIORITY } from "pixi.js";
+import { Application, Container, UPDATE_PRIORITY, Ticker } from "pixi.js";
 
-export class BaseEntity {
+export class BaseEntity extends Container {
   private BASE_HEALTH: number = 50;
-  private BASE_MANA: number = 100;
+  private BASE_MANA: number = 50;
 
-  private strength: number = 5;
-  private intellect: number = 5;
-  private dexterity: number = 5;
-  private luck: number = 5;
+  private str: number = 5;
+  private int: number = 5;
+  private dex: number = 5;
+  private luk: number = 5;
 
   private healthPoints: number;
   private manaPoints: number;
@@ -15,6 +15,8 @@ export class BaseEntity {
   private dead: boolean = false;
 
   constructor() {
+    super();
+
     this.healthPoints = this.calculateHealthPoints();
     this.manaPoints = this.calculateManaPoints();
   }
@@ -33,14 +35,18 @@ export class BaseEntity {
     return this.manaPoints;
   }
 
+  setManaPoints(manaPoints: number) {
+    this.manaPoints = manaPoints
+  }
+
   /* FUNCTIONS */
 
   calculateManaPoints() {
-    return (this.intellect * 32) + this.BASE_MANA;
+    return (this.int * Math.PI) + this.BASE_MANA;
   }
 
   calculateHealthPoints() {
-    return (this.strength * 3.1419) + this.BASE_HEALTH;
+    return (this.str * Math.PI) + this.BASE_HEALTH;
   }
 
 
@@ -52,9 +58,7 @@ export class BaseEntity {
     return this.healthPoints <= 0;
   }
 
-  update(app: Application) {
-    app.ticker.add(() => {
-      this.dead = this.isDead();
-    }, UPDATE_PRIORITY.HIGH);
+  update(delta: number) {
+    this.dead = this.isDead();
   }
 }

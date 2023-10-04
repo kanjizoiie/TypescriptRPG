@@ -1,27 +1,39 @@
-import * as PIXI from 'pixi.js';
-import { AnimatedSprite, Spritesheet } from 'pixi.js';
+import { Assets, ResolverManifest } from 'pixi.js';
 
-const loader = PIXI.Loader.shared;
+// Manifest Example
+export const manifest = {
+  bundles: [
+    {
+      name: 'ui',
+      assets: [
+        {
+          name: 'font',
+          srcs: 'fonts/PressStart2P.ttf',
+        },
+      ]
+    },
+    {
+      name: 'battle',
+      assets: [
+        {
+          name: 'spritesheet',
+          srcs: 'assets/data.json',
+        },
+      ],
+    },
+  ]
+};
 
-const load = (completeCallback: (resources: { spriteSheet?: Spritesheet }) => void) => {
-  const loadedResources: { spriteSheet?: Spritesheet } = {};
 
-  // Chainable `add` to enqueue a resource
-  loader
-    .add('spritesheet_atlas', 'assets/data.json')
-    .add('font', 'assets/PressStart2P.ttf');
-  // The `load` method loads the queue of resources, and calls the passed in callback called once all
-  // resources have loaded.
+export class ContentLoader {
+  constructor(manifest: ResolverManifest) {
+    Assets
+      .init({ manifest })
+  }
 
-  // throughout the process multiple signals can be dispatched.
-  loader.onError.add((error, resource) => { console.error(error) }); // called once per errored file
-  loader.onLoad.add((loader, resource) => { console.log(`Resource: ${resource.name} Finished!`) }); // called once per loaded file
-
-  loader
-    .load((loader, resources) => {
-      loadedResources.spriteSheet = resources.spritesheet_atlas.spritesheet;
-      completeCallback(loadedResources);
+  load(bundle: string | Array<string>): Promise<any> {
+    return Assets.loadBundle(bundle, (progress: number) => {
+      console.log(`Bundle: ${bundle} loading progress is: ${progress}`)
     });
-
+  }
 }
-export { load };

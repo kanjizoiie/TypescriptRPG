@@ -24,7 +24,6 @@ export class InputSystem {
   }
 
   private handleKeyDown(event: KeyboardEvent) {
-    console.log(this.registeredInputs);
     if (this.registeredInputs.has(event.key)) {
       const registeredEvent = this.registeredInputs.get(event.key);
       if (registeredEvent.keydown) registeredEvent.keydown(event)
