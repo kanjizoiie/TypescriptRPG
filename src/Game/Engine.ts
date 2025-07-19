@@ -17,7 +17,6 @@ export interface SceneSettings {
 export class Engine {
   private fpsCounter: FPSCounter;
   private graph: Graph;
-  private grid: Grid;
 
   private app: Application;
   private input: InputSystem;
@@ -36,8 +35,8 @@ export class Engine {
 
   constructor(ref: HTMLDivElement) {
     this.app = new Application({
-      width: 1600,
-      height: 900,
+      width: 800,
+      height: 600,
       backgroundColor: 0x000000,
     });
 
@@ -70,13 +69,11 @@ export class Engine {
 
     ref.appendChild(this.app.view as HTMLCanvasElement);
 
-
-
     this.app.ticker.add((delta) => this.update(delta));
     this.fpsCounter = new FPSCounter(this.app.ticker);
     this.graph = new Graph(this.app.ticker)
-    this.graph.setTransform(0, 50)
-    this.app.stage.addChild(this.fpsCounter, this.graph, this.grid);
+    this.graph.setTransform(2, 64)
+    this.app.stage.addChild(this.fpsCounter, this.graph);
   }
 
   sceneSwitcher = (sceneName: string) => {
@@ -121,7 +118,6 @@ export class Engine {
   update(delta: number): any {
     this.fpsCounter.update(delta);
     this.graph.update(delta);
-    this.grid.update(delta);
   }
 }
 

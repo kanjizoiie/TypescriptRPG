@@ -1,5 +1,4 @@
-import { Assets, ResolverManifest } from 'pixi.js';
-
+import * as PIXI from 'pixi.js';
 // Manifest Example
 export const manifest = {
   bundles: [
@@ -26,14 +25,13 @@ export const manifest = {
 
 
 export class ContentLoader {
-  constructor(manifest: ResolverManifest) {
-    Assets
-      .init({ manifest })
+  constructor(manifest: any) {
+    PIXI.Assets.init({ manifest });
   }
 
   load(bundle: string | Array<string>): Promise<any> {
-    return Assets.loadBundle(bundle, (progress: number) => {
-      console.log(`Bundle: ${bundle} loading progress is: ${progress}`)
+    return PIXI.Assets.loadBundle(bundle, (progress: number) => {
+      console.log(`Bundle: ${bundle} loading progress is: ${progress}`);
     });
   }
 }
