@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: "./src/index.tsx",
   mode: "development",
+  experiments: {
+    asyncWebAssembly: true,
+  },
   resolve: {
     extensions: [".ts", ".tsx", ".js"]
   },
@@ -46,6 +49,10 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.wasm$/,
+        type: 'webassembly/async'
       },
       {
         test: /\.(jpg|png|gif|webp)$/,

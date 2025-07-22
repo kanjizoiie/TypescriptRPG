@@ -8,6 +8,7 @@ import { Scene } from "../../Components/Scene/Scene";
 import { NumberBar } from "../../UI/NumberBar";
 import { TextBox } from "../../UI/TextBox";
 import { InputSystem } from "../../utils/keyboard";
+import RAPIER from "@dimforge/rapier2d";
 
 export interface BattleSceneState {
   battleState: BattleState;
@@ -59,7 +60,7 @@ export class Battle extends Scene {
     app: Application,
     sceneSwitcher: any,
     input: InputSystem,
-    loader: ContentLoader
+    loader: ContentLoader,
   ) {
     super.init(app, sceneSwitcher, input, loader);
   }

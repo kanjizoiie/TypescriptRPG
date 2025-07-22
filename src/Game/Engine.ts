@@ -6,8 +6,6 @@ import { Scene } from '../Components/Scene/Scene';
 import { Battle } from '../Scenes/Battle/Battle';
 import { Overworld } from '../Scenes/Overworld/Overworld';
 import { Graph } from '../Components/Graph/Graph';
-import { Grid } from '../Components/Grid/Grid';
-
 export interface SceneSettings {
   index: number;
   name?: string,
@@ -21,6 +19,7 @@ export class Engine {
   private app: Application;
   private input: InputSystem;
   private loader: ContentLoader;
+
 
   private sceneSettings: Array<SceneSettings> = [
     {
@@ -50,7 +49,7 @@ export class Engine {
           this.app,
           this.sceneSwitcher,
           this.input,
-          this.loader,
+          this.loader
         );
       });
 
@@ -68,7 +67,6 @@ export class Engine {
     }, false);
 
     ref.appendChild(this.app.view as HTMLCanvasElement);
-
     this.app.ticker.add((delta) => this.update(delta));
     this.fpsCounter = new FPSCounter(this.app.ticker);
     this.graph = new Graph(this.app.ticker)
@@ -108,10 +106,11 @@ export class Engine {
       .gameScene
       .load()
       .then(() => {
-        scene
-          .gameScene
-          .setup();
-        this.app.ticker.add((delta: number) => { scene.gameScene.update(delta) });
+        scene.gameScene.setup();
+        this.app.ticker.add((delta: number) => {
+          scene.gameScene.update(delta)
+
+        });
       });
   }
 
